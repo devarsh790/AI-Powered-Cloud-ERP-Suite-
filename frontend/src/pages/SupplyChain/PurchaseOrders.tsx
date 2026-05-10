@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Plus, Search, Filter, Download, FileText, CheckCircle2, Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, Search, Filter, Download } from 'lucide-react';
 import api from '../../services/api';
 
 export const PurchaseOrders = () => {

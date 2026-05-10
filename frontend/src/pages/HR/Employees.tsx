@@ -1,5 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Plus, Search, Filter, Download, Users as UsersIcon, UserCheck, UserMinus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Users as UsersIcon,
+  UserCheck,
+  UserMinus,
+  Shield,
+  MoreHorizontal,
+} from 'lucide-react';
 import api from '../../services/api';
 
 export const Employees = () => {
@@ -20,138 +31,256 @@ export const Employees = () => {
     fetchEmployees();
   }, []);
 
+  const stats = [
+    { label: 'Total workforce', value: '124', icon: UsersIcon, color: 'var(--primary)' },
+    { label: 'Active personnel', value: '118', icon: UserCheck, color: 'var(--success)' },
+    { label: 'On leave / other', value: '6', icon: UserMinus, color: 'var(--warning)' },
+  ];
+
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
-      <div className="flex justify-between items-end">
-        <div>
-          <h1 className="text-2xl font-bold mb-1">Employee Directory</h1>
-          <p className="text-muted">Manage workforce, departments, and roles</p>
-        </div>
-        <div className="flex gap-3">
-          <button className="btn btn-secondary">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.25rem' }}>
+        <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}>
+          <p className="label-overline" style={{ marginBottom: 8, color: 'var(--primary)' }}>
+            Human resources
+          </p>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
+            Workforce <span className="text-gradient">directory</span>
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 520 }}>
+            Govern roles, compliance, and organizational structure from a single enterprise view.
+          </p>
+        </motion.div>
+
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button type="button" className="btn btn-secondary">
             <Download size={18} /> Export
           </button>
-          <button className="btn btn-primary">
-            <Plus size={18} /> Add Employee
+          <button type="button" className="btn btn-primary">
+            <Plus size={18} /> Add employee
           </button>
         </div>
       </div>
 
-      <div className="dashboard-grid mb-2">
-        <div className="card">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <p className="text-muted text-sm font-medium mb-1">Total Workforce</p>
-              <h3 className="text-2xl font-bold text-main">124</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+            className="card card-kpi enterprise-card-static"
+          >
+            <p className="label-overline" style={{ marginBottom: 4 }}>
+              {stat.label}
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+              <h3 style={{ fontSize: '1.75rem' }}>{stat.value}</h3>
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 14,
+                  background: 'var(--surface-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid var(--border-light)',
+                  color: stat.color,
+                }}
+              >
+                <stat.icon size={24} />
+              </div>
             </div>
-            <div className="p-2 rounded-lg bg-primary bg-opacity-10 text-primary">
-              <UsersIcon size={24} />
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <p className="text-muted text-sm font-medium mb-1">Active Employees</p>
-              <h3 className="text-2xl font-bold text-success">118</h3>
-            </div>
-            <div className="p-2 rounded-lg bg-success bg-opacity-10 text-success">
-              <UserCheck size={24} />
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <p className="text-muted text-sm font-medium mb-1">On Leave</p>
-              <h3 className="text-2xl font-bold text-warning">6</h3>
-            </div>
-            <div className="p-2 rounded-lg bg-warning bg-opacity-10 text-warning">
-              <UserMinus size={24} />
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        ))}
       </div>
 
-      <div className="card">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold">All Employees</h3>
-          <div className="flex gap-3">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
-                <Search size={16} />
-              </span>
-              <input 
-                type="text" 
-                placeholder="Search employees..." 
-                className="input-field pl-9 py-1.5 text-sm w-64"
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="card enterprise-card-static"
+        style={{ padding: '1.75rem' }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1.75rem',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+        >
+          <h3 style={{ fontSize: '1.125rem', fontFamily: 'var(--font-display)' }}>Active directory</h3>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative' }}>
+              <Search
+                size={18}
+                style={{
+                  position: 'absolute',
+                  left: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-dim)',
+                  pointerEvents: 'none',
+                }}
+              />
+              <input
+                type="text"
+                className="nexus-input"
+                placeholder="Search people, ID, or department…"
+                style={{ paddingLeft: '2.75rem', width: 'min(320px, 100%)', height: 44 }}
               />
             </div>
-            <button className="btn btn-secondary py-1.5">
-              <Filter size={16} /> Filter
+            <button type="button" className="btn btn-secondary" style={{ height: 44 }}>
+              <Filter size={18} /> Filter
             </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr className="border-b border-light text-muted text-sm">
-                <th className="pb-3 font-medium">Employee</th>
-                <th className="pb-3 font-medium">ID</th>
-                <th className="pb-3 font-medium">Department</th>
-                <th className="pb-3 font-medium">Designation</th>
-                <th className="pb-3 font-medium">Type</th>
-                <th className="pb-3 font-medium text-center">Status</th>
+              <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
+                {['Identity', 'ID', 'Division', 'Role', 'Status', ''].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: '0.85rem 1rem',
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      color: 'var(--text-dim)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-muted">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                    Loading employees...
+                  <td colSpan={6} style={{ padding: '3rem', textAlign: 'center' }}>
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        border: '2px solid rgba(37, 99, 235, 0.2)',
+                        borderTopColor: 'var(--primary)',
+                        borderRadius: '50%',
+                        animation: 'spin 0.9s linear infinite',
+                        margin: '0 auto',
+                      }}
+                    />
+                    <p className="label-overline" style={{ marginTop: 16 }}>
+                      Loading directory
+                    </p>
                   </td>
                 </tr>
               ) : employees.length > 0 ? (
-                employees.map((emp: any) => (
-                  <tr key={emp._id} className="border-b border-light last:border-0 hover:bg-surface-hover transition-colors">
-                    <td className="py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-xs">
-                          {emp.firstName.charAt(0)}{emp.lastName.charAt(0)}
+                employees.map((emp: any, idx: number) => (
+                  <motion.tr
+                    key={emp._id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.04 }}
+                    style={{ borderBottom: '1px solid var(--border-light)' }}
+                    className="matrix-row"
+                  >
+                    <td style={{ padding: '1.1rem 1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 10,
+                            background: 'linear-gradient(145deg, rgba(37,99,235,0.2), rgba(6,182,212,0.12))',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                            color: 'var(--text-primary)',
+                            border: '1px solid var(--border-light)',
+                          }}
+                        >
+                          {emp.firstName.charAt(0)}
+                          {emp.lastName.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-main">{emp.firstName} {emp.lastName}</p>
-                          <p className="text-xs text-muted">{emp.email}</p>
+                          <p style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                            {emp.firstName} {emp.lastName}
+                          </p>
+                          <p style={{ fontSize: '0.8125rem', color: 'var(--text-dim)' }}>{emp.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 text-sm text-muted">{emp.employeeId}</td>
-                    <td className="py-3 text-sm">{emp.department}</td>
-                    <td className="py-3 text-sm">{emp.designation}</td>
-                    <td className="py-3 text-sm text-muted capitalize">{emp.employmentType.replace('-', ' ')}</td>
-                    <td className="py-3 text-center">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        emp.status === 'active' ? 'bg-success-bg text-success' : 
-                        emp.status === 'on-leave' ? 'bg-warning-bg text-warning' : 'bg-danger-bg text-danger'
-                      }`}>
-                        {emp.status.charAt(0).toUpperCase() + emp.status.slice(1)}
-                      </span>
+                    <td style={{ padding: '1.1rem 1rem', fontSize: '0.875rem', fontFamily: 'ui-monospace, monospace', color: 'var(--text-dim)' }}>
+                      {emp.employeeId}
                     </td>
-                  </tr>
+                    <td style={{ padding: '1.1rem 1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        <Shield size={14} color="var(--primary)" />
+                        {emp.department}
+                      </div>
+                    </td>
+                    <td style={{ padding: '1.1rem 1rem' }}>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>{emp.designation}</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{emp.employmentType}</p>
+                    </td>
+                    <td style={{ padding: '1.1rem 1rem' }}>
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '0.3rem 0.65rem',
+                          borderRadius: 999,
+                          fontSize: '0.6875rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.04em',
+                          background:
+                            emp.status === 'active' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                          color: emp.status === 'active' ? 'var(--success)' : 'var(--warning)',
+                          border: `1px solid ${emp.status === 'active' ? 'rgba(34,197,94,0.25)' : 'rgba(245,158,11,0.25)'}`,
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            background: 'currentColor',
+                          }}
+                        />
+                        {String(emp.status).toUpperCase()}
+                      </div>
+                    </td>
+                    <td style={{ padding: '1.1rem 1rem', textAlign: 'right' }}>
+                      <button type="button" className="btn-icon" aria-label="Row actions">
+                        <MoreHorizontal size={20} />
+                      </button>
+                    </td>
+                  </motion.tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-muted">
-                    No employees found.
+                  <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+                    No employees in this workspace.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
+      <style>{`
+        .matrix-row:hover { background: var(--hover-surface) !important; }
+      `}</style>
     </div>
   );
 };

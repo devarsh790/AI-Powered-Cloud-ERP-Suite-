@@ -67,11 +67,12 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
 UserSchema.set('toJSON', {
   virtuals: true,
   transform: (_doc, ret) => {
-    delete ret.password;
-    delete ret.mfaSecret;
-    delete ret.refreshToken;
-    delete ret.__v;
-    return ret;
+    const safe = ret as unknown as Record<string, unknown>;
+    delete safe.password;
+    delete safe.mfaSecret;
+    delete safe.refreshToken;
+    delete safe.__v;
+    return safe;
   },
 });
 

@@ -20,4 +20,6 @@ export const connectDatabase = async (): Promise<void> => {
   });
 };
 
+export const isDatabaseReady = (): boolean => mongoose.connection.readyState === 1;
+
 export default mongoose;

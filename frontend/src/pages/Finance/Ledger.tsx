@@ -1,10 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, Filter, Download, FileText, ArrowRightLeft } from 'lucide-react';
 import api from '../../services/api';
+import { motion } from 'framer-motion';
 
 export const Ledger = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const formatIndianShorthand = (val: number) => {
+    if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
+    if (val >= 100000) return `₹${(val / 100000).toFixed(2)} L`;
+    if (val >= 1000) return `₹${(val / 1000).toFixed(2)} K`;
+    return `₹${val}`;
+  };
 
   useEffect(() => {
     const fetchEntries = async () => {
@@ -21,117 +29,126 @@ export const Ledger = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
-      <div className="flex justify-between items-end">
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-1">General Ledger</h1>
-          <p className="text-slate-600">Manage journal entries and account balances</p>
+          <h1 style={{ marginBottom: '0.5rem' }}>General Ledger</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Manage journal entries and account balances</p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors">
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="btn btn-secondary">
             <Download size={18} /> Export
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+          <button className="btn btn-primary">
             <Plus size={18} /> New Entry
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
-        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-          <div className="flex justify-between items-start mb-4">
+      <div className="grid-12">
+        <div className="card span-4 card-kpi">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <p className="text-slate-600 text-sm font-medium mb-1">Total Assets</p>
-              <h3 className="text-2xl font-bold text-slate-900">$530,000</h3>
+              <p className="label-overline" style={{ marginBottom: '0.5rem' }}>Total Assets</p>
+              <h2 style={{ fontSize: '1.75rem' }}>{formatIndianShorthand(530000)}</h2>
             </div>
-            <div className="p-2 rounded-lg bg-blue-50">
-              <FileText className="text-blue-600" size={24} />
+            <div style={{ padding: '0.75rem', borderRadius: 12, background: 'rgba(230, 74, 25, 0.1)', color: 'var(--primary)' }}>
+              <FileText size={24} />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-          <div className="flex justify-between items-start mb-4">
+        <div className="card span-4 card-kpi">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <p className="text-slate-600 text-sm font-medium mb-1">Total Liabilities</p>
-              <h3 className="text-2xl font-bold text-slate-900">$60,000</h3>
+              <p className="label-overline" style={{ marginBottom: '0.5rem' }}>Total Liabilities</p>
+              <h2 style={{ fontSize: '1.75rem' }}>{formatIndianShorthand(60000)}</h2>
             </div>
-            <div className="p-2 rounded-lg bg-red-50">
-              <ArrowRightLeft className="text-red-600" size={24} />
+            <div style={{ padding: '0.75rem', borderRadius: 12, background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)' }}>
+              <ArrowRightLeft size={24} />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-          <div className="flex justify-between items-start mb-4">
+        <div className="card span-4 card-kpi">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <p className="text-slate-600 text-sm font-medium mb-1">Total Equity</p>
-              <h3 className="text-2xl font-bold text-slate-900">$370,000</h3>
+              <p className="label-overline" style={{ marginBottom: '0.5rem' }}>Total Equity</p>
+              <h2 style={{ fontSize: '1.75rem' }}>{formatIndianShorthand(370000)}</h2>
             </div>
-            <div className="p-2 rounded-lg bg-green-50">
-              <FileText className="text-green-600" size={24} />
+            <div style={{ padding: '0.75rem', borderRadius: 12, background: 'rgba(22, 163, 74, 0.1)', color: 'var(--success)' }}>
+              <FileText size={24} />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-slate-900">Recent Entries</h3>
-          <div className="flex gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+      <div className="card" style={{ padding: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <h3 style={{ fontSize: '1.25rem' }}>Recent Entries</h3>
+          <div style={{ display: 'flex', gap: '0.75rem', flex: 1, justifyContent: 'flex-end', minWidth: 300 }}>
+            <div className="search-field-wrap" style={{ flex: '0 1 320px' }}>
+              <Search 
+                style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)', zIndex: 1 }} 
+                size={16} 
+              />
               <input 
                 type="text" 
                 placeholder="Search entries..." 
-                className="pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm w-64"
+                className="input"
+                style={{ paddingLeft: '2.75rem' }}
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors">
+            <button className="btn btn-secondary">
               <Filter size={16} /> Filter
             </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div style={{ overflowX: 'auto' }}>
+          <table className="data-table">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-600 text-sm">
-                <th className="pb-3 font-medium">Date</th>
-                <th className="pb-3 font-medium">Entry No.</th>
-                <th className="pb-3 font-medium">Description</th>
-                <th className="pb-3 font-medium text-right">Debit</th>
-                <th className="pb-3 font-medium text-right">Credit</th>
-                <th className="pb-3 font-medium text-center">Status</th>
+              <tr>
+                <th>Date</th>
+                <th>Entry No.</th>
+                <th>Description</th>
+                <th style={{ textAlign: 'right' }}>Debit</th>
+                <th style={{ textAlign: 'right' }}>Credit</th>
+                <th style={{ textAlign: 'center' }}>Status</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    Loading entries...
+                  <td colSpan={6} style={{ padding: '3rem', textAlign: 'center' }}>
+                    <div className="animate-spin" style={{ width: 32, height: 32, borderRadius: '50%', border: '2px solid var(--primary)', borderBottomColor: 'transparent', margin: '0 auto 1rem' }}></div>
+                    <p style={{ color: 'var(--text-secondary)' }}>Loading entries...</p>
                   </td>
                 </tr>
               ) : entries.length > 0 ? (
                 entries.map((entry: any) => (
-                  <tr key={entry._id} className="border-b border-slate-200 last:border-0 hover:bg-slate-50 transition-colors">
-                    <td className="py-3 text-sm text-slate-900">{new Date(entry.date).toLocaleDateString()}</td>
-                    <td className="py-3 text-sm font-medium text-slate-900">{entry.entryNumber}</td>
-                    <td className="py-3 text-sm text-slate-600">{entry.description}</td>
-                    <td className="py-3 text-sm text-right font-medium text-slate-900">${entry.totalDebit.toLocaleString()}</td>
-                    <td className="py-3 text-sm text-right font-medium text-slate-900">${entry.totalCredit.toLocaleString()}</td>
-                    <td className="py-3 text-center">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        entry.status === 'posted' ? 'bg-green-100 text-green-700' : 
-                        entry.status === 'draft' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'
-                      }`}>
-                        {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                  <tr key={entry._id}>
+                    <td style={{ color: 'var(--text-primary)' }}>{new Date(entry.date).toLocaleDateString()}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{entry.entryNumber}</td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{entry.description}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>₹{entry.totalDebit.toLocaleString('en-IN')}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>₹{entry.totalCredit.toLocaleString('en-IN')}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      <span className={`label-overline`} style={{ 
+                        fontSize: '0.65rem',
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: 20,
+                        background: entry.status === 'posted' ? 'rgba(22, 163, 74, 0.1)' : entry.status === 'draft' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                        color: entry.status === 'posted' ? 'var(--success)' : entry.status === 'draft' ? 'var(--warning)' : 'var(--danger)',
+                        border: '1px solid currentColor',
+                        display: 'inline-block'
+                      }}>
+                        {entry.status}
                       </span>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                  <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-dim)' }}>
                     No journal entries found.
                   </td>
                 </tr>

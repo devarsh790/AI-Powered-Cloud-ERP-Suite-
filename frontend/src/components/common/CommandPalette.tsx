@@ -1,12 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Command, ArrowRight } from 'lucide-react';
+import {
+  Search,
+  ArrowRight,
+  LayoutDashboard,
+  BarChart3,
+  Users,
+  Box,
+  Briefcase,
+  Settings,
+  Shield,
+  Webhook,
+  BrainCircuit,
+  FileBarChart,
+  Truck,
+  CalendarRange,
+  Clock3,
+  Users2,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+const OPEN_EVENT = 'amdox:open-command-palette';
 
 export const CommandPalette = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [modKey, setModKey] = useState('⌘');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isApple =
+      typeof navigator !== 'undefined' &&
+      (/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.platform === 'MacIntel');
+    setModKey(isApple ? '⌘' : 'Ctrl');
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -18,77 +45,210 @@ export const CommandPalette = () => {
         setIsOpen(false);
       }
     };
+    const handleOpen = () => setIsOpen(true);
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener(OPEN_EVENT, handleOpen);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener(OPEN_EVENT, handleOpen);
+    };
   }, []);
 
   const commands = [
-    { name: 'Go to Dashboard', path: '/dashboard', section: 'Navigation' },
-    { name: 'View General Ledger', path: '/finance/ledger', section: 'Finance' },
-    { name: 'Manage Payroll', path: '/hr/payroll', section: 'HR' },
-    { name: 'Check Inventory', path: '/supply-chain/inventory', section: 'Supply Chain' },
-    { name: 'New Project', path: '/projects/list', section: 'Projects' },
+    { name: 'Executive dashboard', path: '/dashboard', icon: LayoutDashboard, section: 'Overview' },
+    { name: 'Finance ledger', path: '/dashboard/finance/ledger', icon: BarChart3, section: 'Finance' },
+    { name: 'Finance — aging reports', path: '/dashboard/finance/reports', icon: FileBarChart, section: 'Finance' },
+    { name: 'HR — employees', path: '/dashboard/hr/employees', icon: Users, section: 'Human resources' },
+    { name: 'HR — leave', path: '/dashboard/hr/leave', icon: CalendarRange, section: 'Human resources' },
+    { name: 'HR — attendance', path: '/dashboard/hr/attendance', icon: Clock3, section: 'Human resources' },
+    { name: 'Inventory', path: '/dashboard/supply-chain/inventory', icon: Box, section: 'Supply chain' },
+    { name: 'Vendors', path: '/dashboard/supply-chain/vendors', icon: Truck, section: 'Supply chain' },
+    { name: 'Projects', path: '/dashboard/projects/list', icon: Briefcase, section: 'Delivery' },
+    { name: 'Resource allocation', path: '/dashboard/projects/resources', icon: Users2, section: 'Delivery' },
+    { name: 'BI workspace', path: '/dashboard/intelligence', icon: BarChart3, section: 'Intelligence' },
+    { name: 'AI demand forecast', path: '/dashboard/intelligence/forecast', icon: BrainCircuit, section: 'Intelligence' },
+    { name: 'Audit & GDPR', path: '/dashboard/audit', icon: Shield, section: 'Compliance' },
+    { name: 'API & webhooks', path: '/dashboard/integrations', icon: Webhook, section: 'Platform' },
+    { name: 'Settings & admin', path: '/dashboard/settings', icon: Settings, section: 'System' },
   ];
 
-  const filtered = commands.filter(cmd => cmd.name.toLowerCase().includes(query.toLowerCase()));
+  const filtered = commands.filter((cmd) => cmd.name.toLowerCase().includes(query.toLowerCase()));
+
+  const runNavigate = (path: string) => {
+    navigate(path);
+    setIsOpen(false);
+    setQuery('');
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-32">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[12vh] px-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(15, 23, 42, 0.25)',
+              backdropFilter: 'blur(12px)',
+            }}
           />
 
-          {/* Palette */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            initial={{ opacity: 0, scale: 0.96, y: -12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-xl bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden"
+            exit={{ opacity: 0, scale: 0.96, y: -12 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Command search"
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: 560,
+              background: 'var(--bg-surface)',
+              borderRadius: 20,
+              border: '1px solid var(--border-light)',
+              boxShadow: 'var(--shadow-lg), 0 0 0 1px rgba(15,23,42,0.04) inset',
+              overflow: 'hidden',
+            }}
           >
-            <div className="flex items-center px-4 py-3 border-b border-slate-200 bg-white">
-              <Search size={20} className="text-slate-400 mr-3" />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '1.125rem 1.25rem',
+                borderBottom: '1px solid var(--border-light)',
+                background: 'var(--surface-muted)',
+                gap: '0.75rem',
+              }}
+            >
+              <Search size={20} color="var(--text-dim)" />
               <input
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search commands, pages, or data..."
-                className="w-full bg-transparent border-none outline-none text-slate-900 placeholder-slate-500 font-medium"
+                placeholder="Search modules, records, or actions…"
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'var(--text-primary)',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'var(--font-sans)',
+                }}
               />
-              <div className="flex gap-1">
-                <kbd className="px-2 py-1 bg-slate-100 border border-slate-300 rounded text-xs text-slate-600 font-mono">esc</kbd>
-              </div>
+              <kbd
+                style={{
+                  padding: '0.2rem 0.5rem',
+                  background: 'var(--surface-muted)',
+                  borderRadius: 6,
+                  fontSize: '0.65rem',
+                  color: 'var(--text-dim)',
+                  border: '1px solid var(--border-light)',
+                  fontWeight: 700,
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
+                ESC
+              </kbd>
             </div>
 
-            <div className="max-h-80 overflow-y-auto p-2 bg-slate-50">
+            <div style={{ maxHeight: 360, overflowY: 'auto', padding: '0.5rem' }}>
               {filtered.length === 0 ? (
-                <div className="py-8 text-center text-slate-500">No commands found.</div>
+                <div style={{ padding: '2.5rem 1rem', textAlign: 'center' }}>
+                  <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>No matches. Try another keyword.</p>
+                </div>
               ) : (
-                filtered.map((cmd, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      navigate(cmd.path);
-                      setIsOpen(false);
-                      setQuery('');
-                    }}
-                    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 transition-colors text-left group"
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <p
+                    className="label-overline"
+                    style={{ padding: '0.5rem 0.75rem', marginTop: 4 }}
                   >
-                    <div className="flex flex-col">
-                      <span className="text-slate-900 font-medium group-hover:text-blue-600 transition-colors">{cmd.name}</span>
-                      <span className="text-xs text-slate-500">{cmd.section}</span>
-                    </div>
-                    <ArrowRight size={16} className="text-slate-400 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-                  </button>
-                ))
+                    Navigate
+                  </p>
+                  {filtered.map((cmd) => (
+                    <motion.button
+                      key={cmd.path}
+                      type="button"
+                      whileHover={{ x: 3, background: 'var(--hover-surface)' }}
+                      whileTap={{ scale: 0.995 }}
+                      onClick={() => runNavigate(cmd.path)}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.75rem 0.875rem',
+                        borderRadius: 12,
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+                        <div
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: 10,
+                            background: 'var(--surface-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid var(--border-light)',
+                            color: 'var(--text-secondary)',
+                          }}
+                        >
+                          <cmd.icon size={18} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <span style={{ color: 'var(--text-primary)', fontSize: '0.9375rem', fontWeight: 600 }}>
+                            {cmd.name}
+                          </span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{cmd.section}</span>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: 0.55 }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 600 }}>Open</span>
+                        <ArrowRight size={14} color="var(--primary)" />
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
               )}
+            </div>
+
+            <div
+              style={{
+                padding: '0.75rem 1.25rem',
+                borderTop: '1px solid var(--border-light)',
+                background: 'var(--surface-muted)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span className="kbd-group">
+                    <kbd className="kbd">{modKey}</kbd>
+                    <kbd className="kbd">K</kbd>
+                  </span>
+                  Toggle
+                </span>
+              </div>
+              <span style={{ fontSize: '0.65rem', color: 'var(--text-dim)', fontWeight: 600, letterSpacing: '0.08em' }}>
+                AMDOX WORKSPACE
+              </span>
             </div>
           </motion.div>
         </div>
@@ -96,3 +256,7 @@ export const CommandPalette = () => {
     </AnimatePresence>
   );
 };
+
+export function openCommandPalette() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}

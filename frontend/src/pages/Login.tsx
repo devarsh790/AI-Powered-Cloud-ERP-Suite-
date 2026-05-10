@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Building2, Mail, Lock, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import {
+  ShieldCheck,
+  Lock,
+  Mail,
+  ArrowRight,
+  Building2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Globe,
+  CheckCircle2,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [tenantSlug, setTenantSlug] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
@@ -16,97 +28,246 @@ export const Login = () => {
     e.preventDefault();
     try {
       await login({ email, password, tenantSlug: tenantSlug || undefined });
-      toast.success('Welcome back to the Nexus!');
-      navigate('/');
+      toast.success('Enterprise Authorization Successful');
+      navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Login failed');
+      toast.error(error.response?.data?.message || 'Access Denied: Invalid Credentials');
     }
   };
 
-  return (
-    <div className="login-layout">
-      {/* Animated Futuristic Background */}
-      <div className="login-background">
-        <div className="login-blob blob-1"></div>
-        <div className="login-blob blob-2"></div>
-      </div>
+  const trustPoints = [
+    'Tenant-scoped workspaces with isolated data planes',
+    'Encryption in transit; session-bound credentials',
+    'Audit-ready sign-in events and policy hooks',
+  ];
 
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="login-card-container"
-      >
-        <div className="glass-card">
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            {/* You could replace this with a futuristic neon logo SVG */}
-            <h1 className="text-neon" style={{ fontSize: '2.5rem', marginBottom: '0.5rem', letterSpacing: '2px' }}>
-              AMDOX
-            </h1>
-            <p className="text-muted" style={{ letterSpacing: '1px', textTransform: 'uppercase', fontSize: '0.85rem' }}>
-              Secure Nexus Access
-            </p>
+  return (
+    <div className="login-layout login-split">
+      <aside className="login-brand-aside" aria-label="Product information">
+        <div className="login-brand-inner">
+          <Link to="/" className="login-brand-logo" style={{ padding: 0 }}>
+            <img
+              src="/logo.jfif"
+              alt="Amdox"
+              style={{
+                height: 64,
+                width: 'auto',
+                filter: 'drop-shadow(0 4px 12px rgba(230, 74, 25, 0.15))',
+              }}
+              decoding="async"
+            />
+          </Link>
+          <h1 className="login-brand-title">Sign in to your operations core</h1>
+          <p className="login-brand-lede">
+            One surface for finance, people, inventory, and delivery — with the same discipline you expect from industrial
+            software.
+          </p>
+          <ul className="login-trust-list">
+            {trustPoints.map((text) => (
+              <li key={text}>
+                <CheckCircle2 className="login-trust-icon" size={18} strokeWidth={2} aria-hidden />
+                <span>{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="login-brand-footer">
+          <Link to="/">← Back to overview</Link>
+          <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>·</span>
+          Need access? Contact your tenant admin.
+        </p>
+      </aside>
+
+      <div className="login-auth-aside">
+        <motion.div
+          className="login-form-surface"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="login-session-pill" role="status">
+            <span aria-hidden />
+            Secure channel
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div className="form-group mb-4">
-              <label className="form-label">Workspace Node (Optional)</label>
-              <div className="input-icon-wrapper">
-                <Building2 className="icon" size={18} />
+          <h2 style={{ fontSize: '1.625rem', marginBottom: '0.35rem' }}>Welcome back</h2>
+          <p style={{ fontSize: '0.9375rem', marginBottom: '2rem' }}>Use your workspace identity to continue.</p>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.35rem' }}>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: 'var(--text-dim)',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.5rem',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                Workspace
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Building2
+                  style={{
+                    position: 'absolute',
+                    left: '1rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-dim)',
+                  }}
+                  size={16}
+                />
                 <input
                   type="text"
+                  className="input"
+                  placeholder="enterprise-id"
                   value={tenantSlug}
                   onChange={(e) => setTenantSlug(e.target.value)}
-                  placeholder="company-id"
+                  style={{ paddingLeft: '2.75rem' }}
                 />
               </div>
             </div>
 
-            <div className="form-group mb-4">
-              <label className="form-label">Identity Hash (Email)</label>
-              <div className="input-icon-wrapper">
-                <Mail className="icon" size={18} />
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: 'var(--text-dim)',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.5rem',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                Identity
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Mail
+                  style={{
+                    position: 'absolute',
+                    left: '1rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-dim)',
+                  }}
+                  size={16}
+                />
                 <input
                   type="email"
-                  required
+                  className="input"
+                  placeholder="agent@amdox.corp"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="agent@nexus.net"
+                  style={{ paddingLeft: '2.75rem' }}
+                  required
                 />
               </div>
             </div>
 
-            <div className="form-group mb-6">
-              <label className="form-label">Access Key (Password)</label>
-              <div className="input-icon-wrapper">
-                <Lock className="icon" size={18} />
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    color: 'var(--text-dim)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  Passkey
+                </label>
+                <button type="button" className="btn-ghost" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', fontWeight: 600 }}>
+                  Forgot?
+                </button>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <Lock
+                  style={{
+                    position: 'absolute',
+                    left: '1rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-dim)',
+                  }}
+                  size={16}
+                />
                 <input
-                  type="password"
-                  required
+                  type={showPassword ? 'text' : 'password'}
+                  className="input"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  style={{ paddingLeft: '2.75rem', paddingRight: '3rem' }}
+                  required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="btn-icon"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: '0.35rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: 36,
+                    height: 36,
+                    border: 'none',
+                    background: 'transparent',
+                  }}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
-            <motion.button 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit" 
-              disabled={isLoading} 
-              className="btn btn-primary w-full"
-              style={{ padding: '1rem', marginTop: '0.5rem' }}
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: '100%', height: '52px', marginTop: '0.25rem', justifyContent: 'center' }}
+              disabled={isLoading}
             >
-              {isLoading ? <Loader2 size={20} className="animate-spin" /> : 'INITIALIZE LINK'}
-            </motion.button>
+              {isLoading ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : (
+                <>
+                  Authorize access
+                  <ArrowRight size={20} />
+                </>
+              )}
+            </button>
           </form>
 
-          <p className="text-muted mt-8 text-center" style={{ fontSize: '0.8rem' }}>
-            Protocol demo: admin@amdox.com / password
+          <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }} />
+            <span style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 800 }}>
+              Other gateways
+            </span>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }} />
+          </div>
+
+          <div style={{ marginTop: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <button type="button" className="btn btn-secondary" style={{ padding: '0.75rem', fontSize: '0.8125rem', justifyContent: 'center' }}>
+              <Globe size={16} color="var(--primary)" />
+              SSO
+            </button>
+            <button type="button" className="btn btn-secondary" style={{ padding: '0.75rem', fontSize: '0.8125rem', justifyContent: 'center' }}>
+              <ShieldCheck size={16} color="var(--success)" />
+              IAM
+            </button>
+          </div>
+
+          <p style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+            Demo: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>admin@amdox.com</span> /{' '}
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Admin@123</span>
+            <span style={{ display: 'block', marginTop: 6 }}>OIDC/SAML via Azure AD or Google (F-01) wires to IdP in production.</span>
           </p>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 };

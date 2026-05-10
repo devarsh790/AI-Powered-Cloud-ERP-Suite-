@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import env from '../config/env';
 import Tenant from '../models/Tenant';
 import User from '../models/User';
@@ -9,6 +10,7 @@ import Employee, { Leave, Attendance, Payroll } from '../models/hr';
 import { Vendor, PurchaseOrder, InventoryItem } from '../models/supplyChain';
 import Project, { Task } from '../models/project';
 import Notification from '../models/Notification';
+import AuditLog from '../models/AuditLog';
 
 async function seed() {
   await mongoose.connect(env.MONGODB_URI);
@@ -20,13 +22,13 @@ async function seed() {
     JournalEntry.deleteMany({}), Invoice.deleteMany({}),
     Employee.deleteMany({}), Leave.deleteMany({}), Attendance.deleteMany({}), Payroll.deleteMany({}),
     Vendor.deleteMany({}), PurchaseOrder.deleteMany({}), InventoryItem.deleteMany({}),
-    Project.deleteMany({}), Task.deleteMany({}), Notification.deleteMany({}),
+    Project.deleteMany({}), Task.deleteMany({}), Notification.deleteMany({}), AuditLog.deleteMany({}),
   ]);
 
   // Create tenant
   const tenant = await Tenant.create({
     name: 'Amdox Technologies', slug: 'amdox',
-    settings: { currency: 'USD', timezone: 'America/New_York', dateFormat: 'MM/DD/YYYY', fiscalYearStart: 1 },
+    settings: { currency: 'INR', timezone: 'Asia/Kolkata', dateFormat: 'DD/MM/YYYY', fiscalYearStart: 4 },
     subscription: { plan: 'enterprise', status: 'active' },
   });
   const tid = tenant._id;
@@ -81,14 +83,16 @@ async function seed() {
   // Employees
   const depts = ['Engineering', 'Finance', 'HR', 'Marketing', 'Operations', 'Sales'];
   const empData = [
-    { firstName: 'Alex', lastName: 'Johnson', dept: 'Engineering', desig: 'Senior Developer', salary: { basic: 8000, hra: 3200, da: 1600, special: 2200, gross: 15000, currency: 'USD' } },
-    { firstName: 'Maria', lastName: 'Garcia', dept: 'Engineering', desig: 'Tech Lead', salary: { basic: 10000, hra: 4000, da: 2000, special: 4000, gross: 20000, currency: 'USD' } },
-    { firstName: 'David', lastName: 'Kim', dept: 'Finance', desig: 'Financial Analyst', salary: { basic: 7000, hra: 2800, da: 1400, special: 1800, gross: 13000, currency: 'USD' } },
-    { firstName: 'Lisa', lastName: 'Anderson', dept: 'HR', desig: 'HR Manager', salary: { basic: 7500, hra: 3000, da: 1500, special: 2000, gross: 14000, currency: 'USD' } },
-    { firstName: 'Robert', lastName: 'Brown', dept: 'Marketing', desig: 'Marketing Director', salary: { basic: 9000, hra: 3600, da: 1800, special: 2600, gross: 17000, currency: 'USD' } },
-    { firstName: 'Jennifer', lastName: 'Lee', dept: 'Operations', desig: 'Operations Manager', salary: { basic: 8500, hra: 3400, da: 1700, special: 2400, gross: 16000, currency: 'USD' } },
-    { firstName: 'Michael', lastName: 'Taylor', dept: 'Sales', desig: 'Sales Director', salary: { basic: 9500, hra: 3800, da: 1900, special: 2800, gross: 18000, currency: 'USD' } },
-    { firstName: 'Sophie', lastName: 'Martinez', dept: 'Engineering', desig: 'Frontend Developer', salary: { basic: 7000, hra: 2800, da: 1400, special: 1800, gross: 13000, currency: 'USD' } },
+    { firstName: 'Arjun', lastName: 'Mehta', dept: 'Engineering', desig: 'Senior Developer', salary: { basic: 80000, hra: 32000, da: 16000, special: 22000, gross: 150000, currency: 'INR' } },
+    { firstName: 'Priya', lastName: 'Sharma', dept: 'Engineering', desig: 'Tech Lead', salary: { basic: 100000, hra: 40000, da: 20000, special: 40000, gross: 200000, currency: 'INR' } },
+    { firstName: 'Rahul', lastName: 'Varma', dept: 'Finance', desig: 'Financial Analyst', salary: { basic: 70000, hra: 28000, da: 14000, special: 18000, gross: 130000, currency: 'INR' } },
+    { firstName: 'Anjali', lastName: 'Nair', dept: 'HR', desig: 'HR Manager', salary: { basic: 75000, hra: 30000, da: 15000, special: 20000, gross: 140000, currency: 'INR' } },
+    { firstName: 'Vikram', lastName: 'Singh', dept: 'Marketing', desig: 'Marketing Director', salary: { basic: 90000, hra: 36000, da: 18000, special: 26000, gross: 170000, currency: 'INR' } },
+    { firstName: 'Kavita', lastName: 'Patel', dept: 'Operations', desig: 'Operations Manager', salary: { basic: 85000, hra: 34000, da: 17000, special: 24000, gross: 160000, currency: 'INR' } },
+    { firstName: 'Michael', lastName: 'Fernandes', dept: 'Sales', desig: 'Sales Director', salary: { basic: 95000, hra: 38000, da: 19000, special: 28000, gross: 180000, currency: 'INR' } },
+    { firstName: 'Sneha', lastName: 'Gupta', dept: 'Engineering', desig: 'Frontend Developer', salary: { basic: 70000, hra: 28000, da: 14000, special: 18000, gross: 130000, currency: 'INR' } },
+    { firstName: 'Amit', lastName: 'Jain', dept: 'Engineering', desig: 'Fullstack Developer', salary: { basic: 75000, hra: 30000, da: 15000, special: 20000, gross: 140000, currency: 'INR' } },
+    { firstName: 'Pooja', lastName: 'Iyer', dept: 'Finance', desig: 'Accounts Head', salary: { basic: 120000, hra: 48000, da: 24000, special: 38000, gross: 230000, currency: 'INR' } },
   ];
 
   const employees = [];
@@ -112,9 +116,9 @@ async function seed() {
 
   // Vendors
   const vendors = await Vendor.insertMany([
-    { tenantId: tid, vendorCode: 'VEN-0001', name: 'CloudTech Solutions', email: 'sales@cloudtech.com', contactPerson: 'John Smith', paymentTerms: 'Net 30', rating: 4.5, status: 'active', totalOrders: 12, totalSpent: 78000 },
-    { tenantId: tid, vendorCode: 'VEN-0002', name: 'DataPipe Inc', email: 'orders@datapipe.com', contactPerson: 'Amy Chen', paymentTerms: 'Net 45', rating: 4.2, status: 'active', totalOrders: 8, totalSpent: 45000 },
-    { tenantId: tid, vendorCode: 'VEN-0003', name: 'SecureNet Corp', email: 'procurement@securenet.com', contactPerson: 'Mark Johnson', paymentTerms: 'Net 30', rating: 3.8, status: 'active', totalOrders: 5, totalSpent: 32000 },
+    { tenantId: tid, vendorCode: 'VEN-0001', name: 'Reliance Digital', email: 'sales@reliance.com', contactPerson: 'John Smith', paymentTerms: 'Net 30', rating: 4.5, status: 'active', totalOrders: 12, totalSpent: 7800000 },
+    { tenantId: tid, vendorCode: 'VEN-0002', name: 'Tata Communications', email: 'orders@tata.com', contactPerson: 'Amy Chen', paymentTerms: 'Net 45', rating: 4.2, status: 'active', totalOrders: 8, totalSpent: 4500000 },
+    { tenantId: tid, vendorCode: 'VEN-0003', name: 'Infosys BPM', email: 'procurement@infosys.com', contactPerson: 'Mark Johnson', paymentTerms: 'Net 30', rating: 3.8, status: 'active', totalOrders: 5, totalSpent: 3200000 },
   ]);
 
   // Inventory items
@@ -132,7 +136,7 @@ async function seed() {
     description: 'Next-gen enterprise resource planning platform with AI capabilities',
     client: 'Internal', managerId: employees[1]._id,
     startDate: new Date('2026-01-01'), endDate: new Date('2026-06-30'),
-    budget: { planned: 250000, actual: 145000, currency: 'USD' },
+    budget: { planned: 2500000, actual: 1450000, currency: 'INR' },
     status: 'active', priority: 'critical', progress: 62,
     teamMembers: [employees[0]._id, employees[7]._id],
     milestones: [
@@ -149,7 +153,7 @@ async function seed() {
     description: 'React Native mobile app for field operations',
     client: 'Internal', managerId: employees[5]._id,
     startDate: new Date('2026-03-01'), endDate: new Date('2026-09-30'),
-    budget: { planned: 180000, actual: 42000, currency: 'USD' },
+    budget: { planned: 1800000, actual: 420000, currency: 'INR' },
     status: 'active', priority: 'high', progress: 28,
     teamMembers: [employees[0]._id, employees[7]._id],
     milestones: [
@@ -179,6 +183,32 @@ async function seed() {
     { tenantId: tid, projectId: proj1._id, title: 'Integration testing', assigneeId: employees[1]._id, startDate: new Date('2026-05-01'), dueDate: new Date('2026-05-30'), status: 'todo', priority: 'high', estimatedHours: 40, actualHours: 0, order: 6 },
     { tenantId: tid, projectId: proj1._id, title: 'Performance optimization', assigneeId: employees[0]._id, dueDate: new Date('2026-06-15'), status: 'todo', priority: 'medium', estimatedHours: 24, actualHours: 0, order: 7 },
   ]);
+
+  const auditRows: Array<Record<string, unknown>> = [];
+  let prevHash: string | undefined;
+  const pushAudit = (action: string, module: string, details: Record<string, unknown>) => {
+    const at = new Date();
+    const payload = `${prevHash || 'genesis'}|${tid}|${action}|${module}|${at.toISOString()}`;
+    const entryHash = crypto.createHash('sha256').update(payload).digest('hex');
+    auditRows.push({
+      tenantId: tid,
+      actorId: admin._id,
+      actorEmail: admin.email,
+      action,
+      module,
+      details,
+      prevHash,
+      entryHash,
+      createdAt: at,
+    });
+    prevHash = entryHash;
+  };
+  pushAudit('tenant.seed', 'system', { message: 'Database seeded' });
+  pushAudit('user.login', 'auth', { email: admin.email });
+  pushAudit('journal.post', 'finance', { entryNumber: 'JE-00001' });
+  pushAudit('invoice.create', 'finance', { invoiceNumber: 'AR-00002' });
+  pushAudit('inventory.adjust', 'supply_chain', { sku: 'NET-SW-48' });
+  await AuditLog.insertMany(auditRows);
 
   // Notifications
   await Notification.insertMany([
