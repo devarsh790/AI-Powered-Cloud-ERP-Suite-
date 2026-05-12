@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Filter, Download, FileText, ArrowRightLeft } from 'lucide-react';
 import api from '../../services/api';
-import { motion } from 'framer-motion';
+
 
 export const Ledger = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const formatIndianShorthand = (val: number) => {
-    if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
-    if (val >= 100000) return `₹${(val / 100000).toFixed(2)} L`;
-    if (val >= 1000) return `₹${(val / 1000).toFixed(2)} K`;
-    return `₹${val}`;
+    if (val >= 10000000) return `INR ${(val / 10000000).toFixed(2)} Cr`;
+    if (val >= 100000) return `INR ${(val / 100000).toFixed(2)} L`;
+    if (val >= 1000) return `INR ${(val / 1000).toFixed(2)} K`;
+    return `INR ${val}`;
   };
 
   useEffect(() => {
@@ -129,8 +129,8 @@ export const Ledger = () => {
                     <td style={{ color: 'var(--text-primary)' }}>{new Date(entry.date).toLocaleDateString()}</td>
                     <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{entry.entryNumber}</td>
                     <td style={{ color: 'var(--text-secondary)' }}>{entry.description}</td>
-                    <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>₹{entry.totalDebit.toLocaleString('en-IN')}</td>
-                    <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>₹{entry.totalCredit.toLocaleString('en-IN')}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>INR {entry.totalDebit.toLocaleString('en-IN')}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>INR {entry.totalCredit.toLocaleString('en-IN')}</td>
                     <td style={{ textAlign: 'center' }}>
                       <span className={`label-overline`} style={{ 
                         fontSize: '0.65rem',

@@ -13,7 +13,6 @@ import {
   Search,
   ChevronLeft,
   Menu,
-  Cpu,
   Activity,
   ChevronDown,
   BarChart3,
@@ -46,7 +45,7 @@ export const Layout = () => {
     const isApple =
       typeof navigator !== 'undefined' &&
       (/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.platform === 'MacIntel');
-    setPaletteModKey(isApple ? '⌘' : 'Ctrl');
+    setPaletteModKey(isApple ? 'Cmd' : 'Ctrl');
   }, []);
 
   useEffect(() => {
@@ -170,6 +169,10 @@ export const Layout = () => {
   ];
 
   const sidebarWidth = isNarrow ? 280 : isSidebarCollapsed ? 80 : 280;
+  const activeItem =
+    navItems.find((item) => location.pathname === item.path || (item.path !== '/dashboard' && location.pathname.startsWith(item.path))) ||
+    navItems[0];
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <div className="app-layout">
@@ -342,7 +345,7 @@ export const Layout = () => {
               <input
                 type="search"
                 className="input"
-                placeholder="Search or jump…"
+                placeholder="Search modules, records, or actions..."
                 readOnly
                 onFocus={() => openCommandPalette()}
                 onClick={() => openCommandPalette()}
@@ -478,7 +481,7 @@ export const Layout = () => {
                     }}
                   >
                     <p className="label-overline" style={{ padding: '0.5rem 0.75rem' }}>
-                      In-app (F-10)
+                      Notifications
                     </p>
                     {notifications.length === 0 ? (
                       <p className="text-muted text-sm" style={{ padding: '1rem' }}>
@@ -538,6 +541,20 @@ export const Layout = () => {
 
         <main className="content-area">
           <div style={{ maxWidth: 'var(--content-max)', margin: '0 auto' }}>
+            <div className="workspace-context-bar" aria-label="Current workspace context">
+              <div>
+                <p className="label-overline">Current module</p>
+                <strong>{activeItem.name}</strong>
+              </div>
+              <div>
+                <p className="label-overline">Tenant</p>
+                <strong>{user?.tenantName || 'Amdox Demo Workspace'}</strong>
+              </div>
+              <div>
+                <p className="label-overline">Open alerts</p>
+                <strong>{unreadCount}</strong>
+              </div>
+            </div>
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}

@@ -150,7 +150,9 @@ const InvoiceSchema = new Schema<IInvoice>(
 InvoiceSchema.index({ tenantId: 1, invoiceNumber: 1 }, { unique: true });
 InvoiceSchema.index({ tenantId: 1, type: 1, status: 1 });
 
-export const Invoice = mongoose.model<IInvoice>('Invoice', InvoiceSchema);
+export const Invoice = (mongoose.models && (mongoose.models as any).Invoice)
+  ? (mongoose.models as any).Invoice as mongoose.Model<IInvoice>
+  : mongoose.model<IInvoice>('Invoice', InvoiceSchema);
 
 // Payment
 export interface IPayment extends Document {
@@ -182,4 +184,6 @@ const PaymentSchema = new Schema<IPayment>(
   { timestamps: true }
 );
 
-export const Payment = mongoose.model<IPayment>('Payment', PaymentSchema);
+export const Payment = (mongoose.models && (mongoose.models as any).Payment)
+  ? (mongoose.models as any).Payment as mongoose.Model<IPayment>
+  : mongoose.model<IPayment>('Payment', PaymentSchema);

@@ -28,10 +28,10 @@ export const Login = () => {
     e.preventDefault();
     try {
       await login({ email, password, tenantSlug: tenantSlug || undefined });
-      toast.success('Enterprise Authorization Successful');
+      toast.success('Signed in successfully');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Access Denied: Invalid Credentials');
+      toast.error(error.response?.data?.message || 'Invalid workspace credentials');
     }
   };
 
@@ -57,10 +57,9 @@ export const Login = () => {
               decoding="async"
             />
           </Link>
-          <h1 className="login-brand-title">Sign in to your operations core</h1>
+          <h1 className="login-brand-title">Sign in to Amdox ERP</h1>
           <p className="login-brand-lede">
-            One surface for finance, people, inventory, and delivery — with the same discipline you expect from industrial
-            software.
+            One focused workspace for finance, people, inventory, projects, intelligence, and compliance.
           </p>
           <ul className="login-trust-list">
             {trustPoints.map((text) => (
@@ -72,8 +71,8 @@ export const Login = () => {
           </ul>
         </div>
         <p className="login-brand-footer">
-          <Link to="/">← Back to overview</Link>
-          <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>·</span>
+          <Link to="/">Back to overview</Link>
+          <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>/</span>
           Need access? Contact your tenant admin.
         </p>
       </aside>
@@ -142,7 +141,7 @@ export const Login = () => {
                   letterSpacing: '0.5px',
                 }}
               >
-                Identity
+                Email
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail
@@ -178,7 +177,7 @@ export const Login = () => {
                     letterSpacing: '0.5px',
                   }}
                 >
-                  Passkey
+                  Password
                 </label>
                 <button type="button" className="btn-ghost" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', fontWeight: 600 }}>
                   Forgot?
@@ -235,7 +234,7 @@ export const Login = () => {
                 <Loader2 size={20} className="animate-spin" />
               ) : (
                 <>
-                  Authorize access
+                  Sign in
                   <ArrowRight size={20} />
                 </>
               )}
@@ -264,7 +263,7 @@ export const Login = () => {
           <p style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
             Demo: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>admin@amdox.com</span> /{' '}
             <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Admin@123</span>
-            <span style={{ display: 'block', marginTop: 6 }}>OIDC/SAML via Azure AD or Google (F-01) wires to IdP in production.</span>
+            <span style={{ display: 'block', marginTop: 6 }}>OIDC and SAML can be connected to your production identity provider.</span>
           </p>
         </motion.div>
       </div>

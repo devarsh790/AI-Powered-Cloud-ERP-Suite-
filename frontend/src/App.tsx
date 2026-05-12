@@ -4,6 +4,7 @@ import { Layout } from './components/common/Layout';
 import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
+import { Invoices } from './pages/Finance/Invoices';
 import { Ledger } from './pages/Finance/Ledger';
 import { Payables } from './pages/Finance/Payables';
 import { Receivables } from './pages/Finance/Receivables';
@@ -48,7 +49,8 @@ function App() {
           <Route index element={<Dashboard />} />
 
           <Route path="finance">
-            <Route index element={<Navigate to="ledger" replace />} />
+            <Route index element={<Navigate to="invoices" replace />} />
+            <Route path="invoices" element={<Invoices />} />
             <Route path="ledger" element={<Ledger />} />
             <Route path="payables" element={<Payables />} />
             <Route path="receivables" element={<Receivables />} />

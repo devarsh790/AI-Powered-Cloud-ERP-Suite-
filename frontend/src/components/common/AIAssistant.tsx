@@ -18,13 +18,13 @@ export const AIAssistant = () => {
           zIndex: 100,
           width: 56,
           height: 56,
-          borderRadius: 18,
+          borderRadius: 12,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(145deg, var(--primary) 0%, #d84315 55%, var(--accent-cyan) 160%)',
+          background: 'linear-gradient(145deg, var(--primary) 0%, #1d4ed8 72%, var(--accent-cyan) 140%)',
           border: '1px solid var(--border-light)',
-          boxShadow: '0 12px 40px rgba(230, 74, 25, 0.2), 0 0 0 1px rgba(15,23,42,0.04) inset',
+          boxShadow: '0 12px 34px var(--primary-glow), 0 0 0 1px rgba(15,23,42,0.04) inset',
           cursor: 'pointer',
         }}
         whileHover={{ scale: 1.04, y: -2 }}
@@ -40,8 +40,8 @@ export const AIAssistant = () => {
           style={{
             position: 'absolute',
             inset: -6,
-            borderRadius: 22,
-            border: '1px solid rgba(230, 74, 25, 0.45)',
+            borderRadius: 16,
+            border: '1px solid rgba(37, 99, 235, 0.34)',
             pointerEvents: 'none',
           }}
         />
@@ -84,8 +84,8 @@ export const AIAssistant = () => {
                     width: 40,
                     height: 40,
                     borderRadius: 12,
-                    background: 'rgba(230, 74, 25, 0.15)',
-                    border: '1px solid rgba(230, 74, 25, 0.25)',
+                    background: 'rgba(37, 99, 235, 0.12)',
+                    border: '1px solid rgba(37, 99, 235, 0.22)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -155,7 +155,7 @@ export const AIAssistant = () => {
                   }}
                 >
                   I have synchronized the latest signals from finance, HR, and supply chain. Ask for forecasts,
-                  exceptions, or workflow recommendations — responses stay within your tenant boundary.
+                  exceptions, or workflow recommendations. Responses stay within your tenant boundary.
                 </div>
               </div>
 
@@ -180,7 +180,7 @@ export const AIAssistant = () => {
                   type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Ask about KPIs, approvals, or anomalies…"
+                  placeholder="Ask about KPIs, approvals, or anomalies..."
                   className="input"
                   style={{ paddingRight: '3rem', height: 48 }}
                 />
@@ -211,7 +211,7 @@ export const AIAssistant = () => {
                 className="label-overline"
                 style={{ textAlign: 'center', marginTop: '0.75rem', color: 'var(--text-dim)', letterSpacing: '0.12em' }}
               >
-                Enterprise AI · audit-ready
+                Enterprise AI / audit-ready
               </p>
             </div>
           </motion.div>

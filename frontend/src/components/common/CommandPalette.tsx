@@ -25,14 +25,14 @@ const OPEN_EVENT = 'amdox:open-command-palette';
 export const CommandPalette = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [modKey, setModKey] = useState('⌘');
+  const [modKey, setModKey] = useState('Cmd');
   const navigate = useNavigate();
 
   useEffect(() => {
     const isApple =
       typeof navigator !== 'undefined' &&
       (/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.platform === 'MacIntel');
-    setModKey(isApple ? '⌘' : 'Ctrl');
+    setModKey(isApple ? 'Cmd' : 'Ctrl');
   }, []);
 
   useEffect(() => {
@@ -57,10 +57,10 @@ export const CommandPalette = () => {
   const commands = [
     { name: 'Executive dashboard', path: '/dashboard', icon: LayoutDashboard, section: 'Overview' },
     { name: 'Finance ledger', path: '/dashboard/finance/ledger', icon: BarChart3, section: 'Finance' },
-    { name: 'Finance — aging reports', path: '/dashboard/finance/reports', icon: FileBarChart, section: 'Finance' },
-    { name: 'HR — employees', path: '/dashboard/hr/employees', icon: Users, section: 'Human resources' },
-    { name: 'HR — leave', path: '/dashboard/hr/leave', icon: CalendarRange, section: 'Human resources' },
-    { name: 'HR — attendance', path: '/dashboard/hr/attendance', icon: Clock3, section: 'Human resources' },
+    { name: 'Finance aging reports', path: '/dashboard/finance/reports', icon: FileBarChart, section: 'Finance' },
+    { name: 'HR employees', path: '/dashboard/hr/employees', icon: Users, section: 'Human resources' },
+    { name: 'HR leave', path: '/dashboard/hr/leave', icon: CalendarRange, section: 'Human resources' },
+    { name: 'HR attendance', path: '/dashboard/hr/attendance', icon: Clock3, section: 'Human resources' },
     { name: 'Inventory', path: '/dashboard/supply-chain/inventory', icon: Box, section: 'Supply chain' },
     { name: 'Vendors', path: '/dashboard/supply-chain/vendors', icon: Truck, section: 'Supply chain' },
     { name: 'Projects', path: '/dashboard/projects/list', icon: Briefcase, section: 'Delivery' },
@@ -131,7 +131,7 @@ export const CommandPalette = () => {
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search modules, records, or actions…"
+                placeholder="Search modules, records, or actions..."
                 style={{
                   flex: 1,
                   background: 'transparent',

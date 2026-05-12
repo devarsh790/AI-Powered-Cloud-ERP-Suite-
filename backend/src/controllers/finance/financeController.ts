@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../../middleware/auth.middleware';
-import Account, { JournalEntry, Invoice, Payment } from '../../models/finance';
+import Account, { JournalEntry, Payment } from '../../models/finance';
+import InvoiceModel from '../../models/finance/Invoice';
 import { sendSuccess, sendError, sendPaginated } from '../../utils/response';
 
 // ===== Chart of Accounts =====
@@ -80,29 +81,53 @@ export const postJournalEntry = async (req: AuthRequest, res: Response): Promise
   } catch (error: any) { sendError(res, error.message); }
 };
 
-// ===== Invoices (AP/AR) =====
+// ===== Invoices (AR) =====
 export const getInvoices = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    if (!req.user) { sendError(res, 'Unauthorized', 401); return; }
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
-    const filter: any = { tenantId: req.user?.tenantId };
-    if (req.query.type) filter.type = req.query.type;
+    const filter: any = { tenantId: req.user.tenantId };
     if (req.query.status) filter.status = req.query.status;
-    if (req.query.search) filter.vendorOrCustomer = { $regex: req.query.search, $options: 'i' };
-    const total = await Invoice.countDocuments(filter);
-    const invoices = await Invoice.find(filter).sort({ date: -1 }).skip((page - 1) * limit).limit(limit);
+    if (req.query.search) {
+      filter.$or = [
+        { invoiceNumber: { $regex: req.query.search, $options: 'i' } },
+        { customerName: { $regex: req.query.search, $options: 'i' } },
+      ];
+    }
+    const total = await InvoiceModel.countDocuments(filter);
+    const invoices = await InvoiceModel.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit);
     sendPaginated(res, invoices, total, page, limit);
   } catch (error: any) { sendError(res, error.message); }
 };
 
 export const createInvoice = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const type = req.body.type || 'receivable';
-    const prefix = type === 'payable' ? 'AP' : 'AR';
-    const count = await Invoice.countDocuments({ tenantId: req.user?.tenantId, type });
-    const invoice = await Invoice.create({
-      ...req.body, tenantId: req.user?.tenantId, createdBy: req.user?.userId,
-      invoiceNumber: `${prefix}-${String(count + 1).padStart(5, '0')}`,
+    if (!req.user) { sendError(res, 'Unauthorized', 401); return; }
+    const { customerName, customerEmail, lineItems, dueDate, notes, terms } = req.body;
+    
+    const latestInvoice = await InvoiceModel.findOne({ tenantId: req.user.tenantId }).sort({ createdAt: -1 }).lean();
+    const lastNum = latestInvoice ? parseInt(latestInvoice.invoiceNumber.split('-')[1] || '0') : 0;
+    const invoiceNumber = `INV-${String(lastNum + 1).padStart(6, '0')}`;
+    
+    const subtotal = lineItems.reduce((sum: number, item: any) => sum + item.total, 0);
+    const taxAmount = lineItems.reduce((sum: number, item: any) => sum + (item.tax || 0), 0);
+    const total = subtotal + taxAmount;
+    
+    const invoice = await InvoiceModel.create({
+      tenantId: req.user.tenantId,
+      invoiceNumber,
+      customerName,
+      customerEmail,
+      lineItems,
+      subtotal,
+      taxAmount,
+      total,
+      dueDate: new Date(dueDate),
+      notes,
+      terms,
+      createdBy: req.user.userId,
+      status: 'draft',
     });
     sendSuccess(res, invoice, 'Invoice created', 201);
   } catch (error: any) { sendError(res, error.message); }
@@ -110,9 +135,11 @@ export const createInvoice = async (req: AuthRequest, res: Response): Promise<vo
 
 export const updateInvoice = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const invoice = await Invoice.findOneAndUpdate(
-      { _id: req.params.id, tenantId: req.user?.tenantId },
-      req.body, { new: true }
+    if (!req.user) { sendError(res, 'Unauthorized', 401); return; }
+    const invoice = await InvoiceModel.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.user.tenantId },
+      { ...req.body, updatedBy: req.user.userId },
+      { new: true }
     );
     if (!invoice) { sendError(res, 'Invoice not found', 404); return; }
     sendSuccess(res, invoice, 'Invoice updated');
@@ -121,7 +148,12 @@ export const updateInvoice = async (req: AuthRequest, res: Response): Promise<vo
 
 export const deleteInvoice = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const invoice = await Invoice.findOneAndDelete({ _id: req.params.id, tenantId: req.user?.tenantId, status: 'draft' });
+    if (!req.user) { sendError(res, 'Unauthorized', 401); return; }
+    const invoice = await InvoiceModel.findOneAndDelete({
+      _id: req.params.id,
+      tenantId: req.user.tenantId,
+      status: 'draft'
+    });
     if (!invoice) { sendError(res, 'Invoice not found or cannot be deleted', 404); return; }
     sendSuccess(res, null, 'Invoice deleted');
   } catch (error: any) { sendError(res, error.message); }
@@ -138,18 +170,19 @@ export const getPayments = async (req: AuthRequest, res: Response): Promise<void
 
 export const createPayment = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const count = await Payment.countDocuments({ tenantId: req.user?.tenantId });
+    if (!req.user) { sendError(res, 'Unauthorized', 401); return; }
+    const count = await Payment.countDocuments({ tenantId: req.user.tenantId });
     const payment = await Payment.create({
-      ...req.body, tenantId: req.user?.tenantId, processedBy: req.user?.userId,
+      ...req.body, tenantId: req.user.tenantId, processedBy: req.user.userId,
       paymentNumber: `PAY-${String(count + 1).padStart(5, '0')}`,
     });
     // Update invoice paid amount
     if (req.body.invoiceId) {
-      await Invoice.findByIdAndUpdate(req.body.invoiceId, {
-        $inc: { paidAmount: payment.amount },
+      await InvoiceModel.findByIdAndUpdate(req.body.invoiceId, {
+        $inc: { amountPaid: payment.amount },
       });
-      const invoice = await Invoice.findById(req.body.invoiceId);
-      if (invoice && invoice.paidAmount >= invoice.totalAmount) {
+      const invoice = await InvoiceModel.findById(req.body.invoiceId);
+      if (invoice && invoice.amountPaid >= invoice.total) {
         invoice.status = 'paid';
         await invoice.save();
       }
@@ -161,28 +194,24 @@ export const createPayment = async (req: AuthRequest, res: Response): Promise<vo
 // ===== Finance Summary =====
 export const getFinanceSummary = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const tenantId = req.user?.tenantId;
-    const [totalAR, totalAP, accounts, recentEntries] = await Promise.all([
-      Invoice.aggregate([
-        { $match: { tenantId: tenantId as any, type: 'receivable', status: { $nin: ['paid', 'cancelled'] } } },
-        { $group: { _id: null, total: { $sum: '$totalAmount' }, paid: { $sum: '$paidAmount' } } },
-      ]),
-      Invoice.aggregate([
-        { $match: { tenantId: tenantId as any, type: 'payable', status: { $nin: ['paid', 'cancelled'] } } },
-        { $group: { _id: null, total: { $sum: '$totalAmount' }, paid: { $sum: '$paidAmount' } } },
+    if (!req.user) { sendError(res, 'Unauthorized', 401); return; }
+    const tenantId = req.user.tenantId;
+    const [totalAR, accounts, recentEntries] = await Promise.all([
+      InvoiceModel.aggregate([
+        { $match: { tenantId: tenantId as any, status: { $nin: ['paid', 'cancelled'] } } },
+        { $group: { _id: null, total: { $sum: '$total' }, paid: { $sum: '$amountPaid' } } },
       ]),
       Account.aggregate([
         { $match: { tenantId: tenantId as any, isActive: true } },
         { $group: { _id: '$type', totalBalance: { $sum: '$balance' }, count: { $sum: 1 } } },
       ]),
-      JournalEntry.find({ tenantId }).sort({ createdAt: -1 }).limit(5),
+      InvoiceModel.find({ tenantId }).sort({ createdAt: -1 }).limit(5),
     ]);
 
     sendSuccess(res, {
       receivables: totalAR[0] || { total: 0, paid: 0 },
-      payables: totalAP[0] || { total: 0, paid: 0 },
       accountsByType: accounts,
-      recentEntries,
+      recentInvoices: recentEntries,
     });
   } catch (error: any) { sendError(res, error.message); }
 };
