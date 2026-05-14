@@ -49,7 +49,7 @@ const mixSeed = [
   { name: 'Projects', value: 16 },
 ];
 
-const COLORS = ['#2563eb', '#06b6d4', '#8b5cf6', '#10b981'];
+const COLORS = ['#e64a19', '#f59e0b', '#334155', '#94a3b8'];
 
 export const Intelligence = () => {
   const [widgets, setWidgets] = useState<WidgetId[]>(defaultWidgets);
@@ -100,7 +100,7 @@ export const Intelligence = () => {
             Business intelligence
           </p>
           <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-            Executive <span className="text-gradient">workspace</span>
+            Executive <span className="text-primary">workspace</span>
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 560 }}>
             Drag-and-drop style builder (F-08): compose KPI canvases, schedule exports, and drill into operational modules.
@@ -186,18 +186,21 @@ export const Intelligence = () => {
             <div style={{ width: '100%', height: 260 }}>
               <ResponsiveContainer>
                 <BarChart data={revenueSeed}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
-                  <XAxis dataKey="name" tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
-                  <YAxis tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{
-                      background: 'var(--bg-surface)',
+                      background: 'rgba(255, 255, 255, 0.95)',
                       border: '1px solid var(--border-light)',
-                      borderRadius: 12,
+                      backdropFilter: 'blur(12px)',
+                      borderRadius: 8,
+                      boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)'
                     }}
+                    cursor={{ fill: 'rgba(15, 23, 42, 0.04)' }}
                   />
-                  <Bar dataKey="plan" fill="rgba(37,99,235,0.25)" radius={[6, 6, 0, 0]} name="Plan" />
-                  <Bar dataKey="actual" fill="var(--primary)" radius={[6, 6, 0, 0]} name="Actual" />
+                  <Bar dataKey="plan" fill="rgba(230, 74, 25, 0.25)" radius={[4, 4, 0, 0]} name="Plan" />
+                  <Bar dataKey="actual" fill="var(--primary)" radius={[4, 4, 0, 0]} name="Actual" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -210,12 +213,19 @@ export const Intelligence = () => {
             <div style={{ width: '100%', height: 260 }}>
               <ResponsiveContainer>
                 <PieChart>
-                  <Pie data={mixSeed} dataKey="value" nameKey="name" innerRadius={56} outerRadius={88} paddingAngle={4}>
+                  <Pie data={mixSeed} dataKey="value" nameKey="name" innerRadius={64} outerRadius={96} paddingAngle={6} stroke="none">
                     {mixSeed.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip 
+                    contentStyle={{
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      border: '1px solid var(--border-light)',
+                      borderRadius: 8,
+                      boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)'
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -228,18 +238,19 @@ export const Intelligence = () => {
             <div style={{ width: '100%', height: 260 }}>
               <ResponsiveContainer>
                 <LineChart data={runrate}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
-                  <XAxis dataKey="name" tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
-                  <YAxis tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-dim)', fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{
-                      background: 'var(--bg-surface)',
+                      background: 'rgba(255, 255, 255, 0.95)',
                       border: '1px solid var(--border-light)',
-                      borderRadius: 12,
+                      borderRadius: 8,
+                      boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)'
                     }}
                   />
-                  <Line type="monotone" dataKey="actual" stroke="var(--primary)" strokeWidth={2} dot={false} name="Actual" />
-                  <Line type="monotone" dataKey="run" stroke="var(--accent-cyan)" strokeWidth={2} dot={false} name="Run-rate" />
+                  <Line type="monotone" dataKey="actual" stroke="var(--primary)" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} name="Actual" />
+                  <Line type="monotone" dataKey="run" stroke="var(--accent-purple)" strokeDasharray="5 5" strokeWidth={3} dot={false} name="Run-rate" />
                 </LineChart>
               </ResponsiveContainer>
             </div>

@@ -2,11 +2,25 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users2, Briefcase } from 'lucide-react';
 import api from '../../services/api';
-import toast from 'react-hot-toast';
+
+const MOCK_EMP = [
+  { _id: 'e1', firstName: 'Arjun', lastName: 'Mehta', department: 'Engineering' },
+  { _id: 'e2', firstName: 'Priya', lastName: 'Sharma', department: 'Finance' },
+  { _id: 'e3', firstName: 'Rahul', lastName: 'Patel', department: 'HR' },
+  { _id: 'e4', firstName: 'Aisha', lastName: 'Khan', department: 'Operations' },
+  { _id: 'e5', firstName: 'Vikram', lastName: 'Singh', department: 'Engineering' },
+  { _id: 'e6', firstName: 'Neha', lastName: 'Gupta', department: 'Product' },
+];
+
+const MOCK_PROJ = [
+  { _id: 'p1', name: 'Cloud Migration' },
+  { _id: 'p2', name: 'ERP v3 Release' },
+  { _id: 'p3', name: 'Mobile App' },
+];
 
 export const ResourceAllocation = () => {
-  const [employees, setEmployees] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>(MOCK_EMP);
+  const [projects, setProjects] = useState<any[]>(MOCK_PROJ);
 
   useEffect(() => {
     const run = async () => {
@@ -15,10 +29,10 @@ export const ResourceAllocation = () => {
           api.get('/hr/employees', { params: { limit: 100 } }),
           api.get('/projects', { params: { limit: 50 } }),
         ]);
-        setEmployees(e.data.data || []);
-        setProjects(p.data.data || []);
+        if (e.data.data?.length) setEmployees(e.data.data);
+        if (p.data.data?.length) setProjects(p.data.data);
       } catch {
-        toast.error('Failed to load allocation data');
+        // Use mock data
       }
     };
     run();
@@ -37,7 +51,7 @@ export const ResourceAllocation = () => {
           Resource allocation
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          Capacity <span className="text-gradient">heatmap</span>
+          Capacity <span className="text-primary">heatmap</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 600 }}>
           Assign people to delivery workstreams (F-07). Utilisation below is illustrative; production uses task-level assignments

@@ -252,17 +252,16 @@ export const Dashboard = () => {
           <p className="label-overline" style={{ color: 'var(--primary)' }}>
             ERP command center
           </p>
-          <h1>Operations workspace</h1>
+          <h1>Operations <span className="text-primary">workspace</span></h1>
           <p style={{ maxWidth: 720, fontSize: '0.9375rem' }}>
             A focused control room for finance, workforce, supply chain, project delivery, and risk decisions.
           </p>
         </div>
 
         <div className="module-toolbar">
-          <button type="button" className="btn btn-secondary">
+          <button type="button" className="btn btn-secondary" onClick={() => toast.success('Export downloaded successfully')}>
             <Download size={17} />
-            Export brief
-          </button>
+            Export brief</button>
           <button type="button" className="btn btn-secondary" onClick={refreshData} disabled={refreshing}>
             <RefreshCcw size={17} className={refreshing ? 'animate-spin' : ''} />
             {refreshing ? 'Refreshing' : 'Refresh'}

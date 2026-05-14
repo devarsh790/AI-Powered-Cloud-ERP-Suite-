@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { motion } from 'framer-motion';
 import {
-  ShieldCheck,
   Lock,
   Mail,
   ArrowRight,
@@ -11,7 +10,6 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  Globe,
   CheckCircle2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -35,6 +33,7 @@ export const Login = () => {
     }
   };
 
+
   const trustPoints = [
     'Tenant-scoped workspaces with isolated data planes',
     'Encryption in transit; session-bound credentials',
@@ -57,7 +56,7 @@ export const Login = () => {
               decoding="async"
             />
           </Link>
-          <h1 className="login-brand-title">Sign in to Amdox ERP</h1>
+          <h1 className="login-brand-title">Sign in to Amdox <span className="text-primary">ERP</span></h1>
           <p className="login-brand-lede">
             One focused workspace for finance, people, inventory, projects, intelligence, and compliance.
           </p>
@@ -241,29 +240,9 @@ export const Login = () => {
             </button>
           </form>
 
-          <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }} />
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 800 }}>
-              Other gateways
-            </span>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }} />
-          </div>
-
-          <div style={{ marginTop: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-            <button type="button" className="btn btn-secondary" style={{ padding: '0.75rem', fontSize: '0.8125rem', justifyContent: 'center' }}>
-              <Globe size={16} color="var(--primary)" />
-              SSO
-            </button>
-            <button type="button" className="btn btn-secondary" style={{ padding: '0.75rem', fontSize: '0.8125rem', justifyContent: 'center' }}>
-              <ShieldCheck size={16} color="var(--success)" />
-              IAM
-            </button>
-          </div>
-
           <p style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
             Demo: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>admin@amdox.com</span> /{' '}
             <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Admin@123</span>
-            <span style={{ display: 'block', marginTop: 6 }}>OIDC and SAML can be connected to your production identity provider.</span>
           </p>
         </motion.div>
       </div>

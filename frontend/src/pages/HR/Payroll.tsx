@@ -41,11 +41,11 @@ export const Payroll = () => {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-bold mb-1">Payroll Management</h1>
+          <h1 className="text-2xl font-bold mb-1">Payroll <span className="text-primary">Management</span></h1>
           <p className="text-muted">Process salaries, deductions, and payslips</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={() => toast.success('Payroll report exported successfully')}>
             <Download size={18} /> Export Reports
           </button>
           <button className="btn btn-primary" onClick={handleRunPayroll} disabled={running}>

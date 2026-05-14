@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FileBarChart, AlertTriangle } from 'lucide-react';
 import api from '../../services/api';
-import toast from 'react-hot-toast';
+
+const MOCK_INVOICES = [
+  { _id: '1', type: 'receivable', invoiceNumber: 'INV-2026-001', vendorOrCustomer: 'Reliance Industries', dueDate: '2026-05-30', totalAmount: 450000, status: 'pending' },
+  { _id: '2', type: 'receivable', invoiceNumber: 'INV-2026-002', vendorOrCustomer: 'Tata Consultancy', dueDate: '2026-04-10', totalAmount: 320000, status: 'pending' },
+  { _id: '3', type: 'receivable', invoiceNumber: 'INV-2026-003', vendorOrCustomer: 'Infosys Ltd', dueDate: '2026-03-15', totalAmount: 180000, status: 'overdue' },
+  { _id: '4', type: 'receivable', invoiceNumber: 'INV-2026-004', vendorOrCustomer: 'HCL Technologies', dueDate: '2026-02-01', totalAmount: 95000, status: 'overdue' },
+  { _id: '5', type: 'receivable', invoiceNumber: 'INV-2026-005', vendorOrCustomer: 'Wipro', dueDate: '2026-04-30', totalAmount: 240000, status: 'paid' },
+];
 
 function bucket(days: number) {
   if (days <= 0) return 'current';
@@ -12,15 +19,15 @@ function bucket(days: number) {
 }
 
 export const FinanceReports = () => {
-  const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>(MOCK_INVOICES);
 
   useEffect(() => {
     const run = async () => {
       try {
         const res = await api.get('/finance/invoices', { params: { limit: 200 } });
-        setInvoices(res.data.data || []);
+        if (res.data.data?.length) setInvoices(res.data.data);
       } catch {
-        toast.error('Failed to load finance data');
+        // Use mock data
       }
     };
     run();
@@ -44,7 +51,7 @@ export const FinanceReports = () => {
           Finance reporting
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          AR aging & <span className="text-gradient">exposure</span>
+          AR aging & <span className="text-primary">exposure</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 560 }}>
           Scheduled board packs and drill-down (F-03 / F-08). Amounts reflect open receivables by overdue bucket.

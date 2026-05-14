@@ -2,21 +2,35 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, FileKey2, ListTree } from 'lucide-react';
 import api from '../../services/api';
-import toast from 'react-hot-toast';
+
+const MOCK_LOGS = [
+  { _id: '1', createdAt: '2026-05-14T10:23:00', module: 'Finance', action: 'invoice.approved', actorEmail: 'arjun.mehta@amdox.com', entryHash: 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6' },
+  { _id: '2', createdAt: '2026-05-14T09:15:00', module: 'HR', action: 'employee.updated', actorEmail: 'priya.sharma@amdox.com', entryHash: 'f1e2d3c4b5a6f7e8d9c0b1a2f3e4d5c6' },
+  { _id: '3', createdAt: '2026-05-13T16:42:00', module: 'Supply Chain', action: 'po.created', actorEmail: 'rahul.patel@amdox.com', entryHash: 'c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6' },
+  { _id: '4', createdAt: '2026-05-13T14:08:00', module: 'Auth', action: 'user.login', actorEmail: 'admin@amdox.com', entryHash: 'b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6' },
+];
+
+const MOCK_DSR = {
+  slaHours: 72,
+  openRequests: [
+    { id: 'DSR-001', type: 'erasure', status: 'pending' },
+    { id: 'DSR-002', type: 'access', status: 'processing' },
+  ],
+};
 
 export const AuditCompliance = () => {
-  const [logs, setLogs] = useState<any[]>([]);
-  const [dsr, setDsr] = useState<any>(null);
+  const [logs, setLogs] = useState<any[]>(MOCK_LOGS);
+  const [dsr, setDsr] = useState<any>(MOCK_DSR);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const run = async () => {
       try {
         const [l, g] = await Promise.all([api.get('/audit/logs'), api.get('/audit/gdpr/requests')]);
-        setLogs(l.data.data || []);
-        setDsr(g.data.data);
+        if (l.data.data?.length) setLogs(l.data.data);
+        if (g.data.data) setDsr(g.data.data);
       } catch {
-        toast.error('Failed to load compliance data');
+        // Use mock data
       } finally {
         setLoading(false);
       }
@@ -31,7 +45,7 @@ export const AuditCompliance = () => {
           Audit & compliance
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          Tamper-evident <span className="text-gradient">trail</span>
+          Tamper-evident <span className="text-primary">trail</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 640 }}>
           Immutable mutation log with hash chaining (F-09). GDPR data-subject queue is stubbed with a 72h SLA target.

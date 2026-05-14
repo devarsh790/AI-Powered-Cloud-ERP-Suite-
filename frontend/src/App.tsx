@@ -25,6 +25,7 @@ import { IntegrationsApi } from './pages/Integrations/IntegrationsApi';
 import { SettingsAdmin } from './pages/Settings/SettingsAdmin';
 import { useAuthStore } from './store/authStore';
 
+
 function App() {
   const { isAuthenticated } = useAuthStore();
 

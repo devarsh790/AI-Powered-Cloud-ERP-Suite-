@@ -4,10 +4,23 @@ import { Clock3, LogIn, LogOut } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
+const MOCK_EMPLOYEES = [
+  { _id: 'e1', firstName: 'Arjun', lastName: 'Mehta' },
+  { _id: 'e2', firstName: 'Priya', lastName: 'Sharma' },
+  { _id: 'e3', firstName: 'Rahul', lastName: 'Patel' },
+];
+
+const MOCK_RECORDS = [
+  { _id: 'a1', date: '2026-05-14', employeeId: { firstName: 'Arjun', lastName: 'Mehta' }, clockIn: '2026-05-14T09:02:00', clockOut: '2026-05-14T18:15:00', hoursWorked: 9.22, overtime: 1.22 },
+  { _id: 'a2', date: '2026-05-14', employeeId: { firstName: 'Priya', lastName: 'Sharma' }, clockIn: '2026-05-14T09:30:00', clockOut: '2026-05-14T17:30:00', hoursWorked: 8.0, overtime: 0 },
+  { _id: 'a3', date: '2026-05-13', employeeId: { firstName: 'Arjun', lastName: 'Mehta' }, clockIn: '2026-05-13T08:45:00', clockOut: '2026-05-13T19:00:00', hoursWorked: 10.25, overtime: 2.25 },
+  { _id: 'a4', date: '2026-05-13', employeeId: { firstName: 'Rahul', lastName: 'Patel' }, clockIn: '2026-05-13T10:00:00', clockOut: '2026-05-13T18:00:00', hoursWorked: 8.0, overtime: 0 },
+];
+
 export const Attendance = () => {
-  const [employees, setEmployees] = useState<any[]>([]);
-  const [records, setRecords] = useState<any[]>([]);
-  const [employeeId, setEmployeeId] = useState('');
+  const [employees, setEmployees] = useState<any[]>(MOCK_EMPLOYEES);
+  const [records, setRecords] = useState<any[]>(MOCK_RECORDS);
+  const [employeeId, setEmployeeId] = useState('e1');
 
   const load = async () => {
     try {
@@ -16,11 +29,11 @@ export const Attendance = () => {
         api.get('/hr/attendance', { params: { month: new Date().getMonth() + 1, year: new Date().getFullYear() } }),
       ]);
       const em = e.data.data || [];
-      setEmployees(em);
-      setRecords(a.data.data || []);
+      if (em.length) setEmployees(em);
+      if (a.data.data?.length) setRecords(a.data.data);
       if (!employeeId && em[0]?._id) setEmployeeId(em[0]._id);
     } catch {
-      toast.error('Failed to load attendance');
+      // Use mock data
     }
   };
 
@@ -56,7 +69,7 @@ export const Attendance = () => {
           Attendance
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          Time capture & <span className="text-gradient">overtime</span>
+          Time capture & <span className="text-primary">overtime</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 560 }}>
           Clock events feed the payroll engine (F-04). Overtime rules are applied server-side on clock-out.

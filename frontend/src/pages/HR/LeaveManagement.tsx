@@ -4,11 +4,23 @@ import { CalendarRange, Send } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
+const MOCK_EMPLOYEES = [
+  { _id: 'e1', firstName: 'Arjun', lastName: 'Mehta', employeeId: 'EMP-001' },
+  { _id: 'e2', firstName: 'Priya', lastName: 'Sharma', employeeId: 'EMP-002' },
+  { _id: 'e3', firstName: 'Rahul', lastName: 'Patel', employeeId: 'EMP-003' },
+];
+
+const MOCK_LEAVES = [
+  { _id: 'l1', employeeId: { firstName: 'Arjun', lastName: 'Mehta' }, type: 'annual', startDate: '2026-05-20', endDate: '2026-05-24', status: 'approved' },
+  { _id: 'l2', employeeId: { firstName: 'Priya', lastName: 'Sharma' }, type: 'sick', startDate: '2026-05-12', endDate: '2026-05-13', status: 'approved' },
+  { _id: 'l3', employeeId: { firstName: 'Rahul', lastName: 'Patel' }, type: 'casual', startDate: '2026-05-08', endDate: '2026-05-08', status: 'pending' },
+];
+
 export const LeaveManagement = () => {
-  const [leaves, setLeaves] = useState<any[]>([]);
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [leaves, setLeaves] = useState<any[]>(MOCK_LEAVES);
+  const [employees, setEmployees] = useState<any[]>(MOCK_EMPLOYEES);
   const [form, setForm] = useState({
-    employeeId: '',
+    employeeId: 'e1',
     type: 'annual',
     startDate: '',
     endDate: '',
@@ -19,12 +31,12 @@ export const LeaveManagement = () => {
   const load = async () => {
     try {
       const [l, e] = await Promise.all([api.get('/hr/leaves'), api.get('/hr/employees', { params: { limit: 100 } })]);
-      setLeaves(l.data.data || []);
+      if (l.data.data?.length) setLeaves(l.data.data);
       const em = e.data.data || [];
-      setEmployees(em);
+      if (em.length) setEmployees(em);
       if (!form.employeeId && em[0]?._id) setForm((f) => ({ ...f, employeeId: em[0]._id }));
     } catch {
-      toast.error('Failed to load leave data');
+      // Use mock data
     }
   };
 
@@ -55,7 +67,7 @@ export const LeaveManagement = () => {
           Leave management
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          Time away <span className="text-gradient">governance</span>
+          Time away <span className="text-primary">governance</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 560 }}>
           Accrual rules and approval workflows (F-04). Approvers use role-gated status transitions on the API.

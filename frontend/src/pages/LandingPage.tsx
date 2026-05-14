@@ -48,7 +48,7 @@ export const LandingPage = () => {
             <p className="label-overline" style={{ color: '#dbeafe', marginBottom: 12 }}>
               Enterprise resource planning
             </p>
-            <h1>Amdox ERP</h1>
+            <h1>Amdox <span className="text-primary">ERP</span></h1>
             <p>
               A calm operations workspace for finance, people, supply chain, projects, intelligence, and compliance.
             </p>

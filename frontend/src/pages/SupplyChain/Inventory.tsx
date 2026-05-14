@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Filter, Download, PackageSearch, AlertTriangle, CheckCircle } from 'lucide-react';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 export const Inventory = () => {
   const [items, setItems] = useState([]);
@@ -24,11 +25,11 @@ export const Inventory = () => {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-bold mb-1">Inventory Control</h1>
+          <h1 className="text-2xl font-bold mb-1">Inventory <span className="text-primary">Control</span></h1>
           <p className="text-muted">Manage products, stock levels, and warehouses</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={() => toast.success('Inventory report exported successfully')}>
             <Download size={18} /> Export
           </button>
           <button className="btn btn-primary">

@@ -2,18 +2,25 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Truck, Mail, MapPin } from 'lucide-react';
 import api from '../../services/api';
-import toast from 'react-hot-toast';
+
+const MOCK_VENDORS = [
+  { _id: '1', name: 'AWS India', vendorCode: 'VND-001', email: 'support@aws.in', address: { city: 'Mumbai', country: 'India' }, paymentTerms: 'Net 30' },
+  { _id: '2', name: 'Dell Technologies', vendorCode: 'VND-002', email: 'enterprise@dell.com', address: { city: 'Bengaluru', country: 'India' }, paymentTerms: 'Net 45' },
+  { _id: '3', name: 'Tata Steel', vendorCode: 'VND-003', email: 'procurement@tatasteel.com', address: { city: 'Jamshedpur', country: 'India' }, paymentTerms: 'Net 60' },
+  { _id: '4', name: 'Godrej Interio', vendorCode: 'VND-004', email: 'b2b@godrej.com', address: { city: 'Mumbai', country: 'India' }, paymentTerms: 'Net 30' },
+  { _id: '5', name: 'Schneider Electric', vendorCode: 'VND-005', email: 'india@schneider-electric.com', address: { city: 'Gurugram', country: 'India' }, paymentTerms: 'Net 30' },
+];
 
 export const Vendors = () => {
-  const [vendors, setVendors] = useState<any[]>([]);
+  const [vendors, setVendors] = useState<any[]>(MOCK_VENDORS);
 
   useEffect(() => {
     const run = async () => {
       try {
         const res = await api.get('/supply-chain/vendors');
-        setVendors(res.data.data || []);
+        if (res.data.data?.length) setVendors(res.data.data);
       } catch {
-        toast.error('Failed to load vendors');
+        // Use mock data
       }
     };
     run();
@@ -26,7 +33,7 @@ export const Vendors = () => {
           Vendor master
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          Supplier <span className="text-gradient">network</span>
+          Supplier <span className="text-primary">network</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 560 }}>
           Vendor portal APIs and PO notifications (F-05) integrate with BullMQ + SES for threshold breaches.

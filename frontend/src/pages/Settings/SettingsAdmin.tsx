@@ -21,7 +21,7 @@ export const SettingsAdmin = () => {
           Tenant administration
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          Security & <span className="text-gradient">policies</span>
+          Security & <span className="text-primary">policies</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 620 }}>
           Multi-tenant auth with OIDC/SAML (F-01) maps to Keycloak realms in production. Preferences below mirror enterprise

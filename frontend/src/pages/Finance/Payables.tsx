@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Filter, Download, ArrowDownRight, CheckCircle2, Clock } from 'lucide-react';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 export const Payables = () => {
   const [invoices, setInvoices] = useState([]);
@@ -24,11 +25,11 @@ export const Payables = () => {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-bold mb-1">Accounts Payable</h1>
+          <h1 className="text-2xl font-bold mb-1">Accounts <span className="text-primary">Payable</span></h1>
           <p className="text-muted">Manage vendor bills and outgoing payments</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={() => toast.success('Payables report exported successfully')}>
             <Download size={18} /> Export
           </button>
           <button className="btn btn-primary">

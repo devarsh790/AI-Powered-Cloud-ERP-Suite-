@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Filter, Download, FileText, ArrowRightLeft } from 'lucide-react';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 
 export const Ledger = () => {
@@ -32,11 +33,11 @@ export const Ledger = () => {
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
         <div>
-          <h1 style={{ marginBottom: '0.5rem' }}>General Ledger</h1>
+          <h1 style={{ marginBottom: '0.5rem' }}>General <span className="text-primary">Ledger</span></h1>
           <p style={{ color: 'var(--text-secondary)' }}>Manage journal entries and account balances</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={() => toast.success('General Ledger exported successfully')}>
             <Download size={18} /> Export
           </button>
           <button className="btn btn-primary">

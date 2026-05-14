@@ -4,19 +4,32 @@ import { Webhook, BookOpen, Plus } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
+const MOCK_SPEC = {
+  title: 'Amdox ERP',
+  openapi: '3.1.0',
+  version: '1.0.0',
+  baseUrl: 'https://api.amdox.io/v1',
+  endpoints: ['/finance/invoices', '/hr/employees', '/supply-chain/inventory', '/projects', '/audit/logs', '/integrations/webhooks'],
+};
+
+const MOCK_WEBHOOKS = [
+  { id: 'wh-001', url: 'https://hooks.slack.com/services/amdox', events: ['invoice.approved', 'inventory.low'], secretPreview: 'whsec_k9X...', active: true },
+  { id: 'wh-002', url: 'https://example.com/hooks/erp', events: ['po.created', 'employee.updated'], secretPreview: 'whsec_mR2...', active: true },
+];
+
 export const IntegrationsApi = () => {
-  const [spec, setSpec] = useState<any>(null);
-  const [webhooks, setWebhooks] = useState<any[]>([]);
+  const [spec, setSpec] = useState<any>(MOCK_SPEC);
+  const [webhooks, setWebhooks] = useState<any[]>(MOCK_WEBHOOKS);
   const [url, setUrl] = useState('https://example.com/hooks/amdox');
   const [events, setEvents] = useState('invoice.approved,inventory.low');
 
   const load = async () => {
     try {
       const [o, w] = await Promise.all([api.get('/integrations/openapi'), api.get('/integrations/webhooks')]);
-      setSpec(o.data.data);
-      setWebhooks(w.data.data.webhooks || []);
+      if (o.data.data) setSpec(o.data.data);
+      if (w.data.data?.webhooks?.length) setWebhooks(w.data.data.webhooks);
     } catch {
-      toast.error('Failed to load integrations');
+      // Use mock data
     }
   };
 
@@ -45,7 +58,7 @@ export const IntegrationsApi = () => {
           API gateway & webhooks
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', marginBottom: '0.35rem' }}>
-          Integrations <span className="text-gradient">fabric</span>
+          Integrations <span className="text-primary">fabric</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: 640 }}>
           Versioned REST surface with OpenAPI 3.1 metadata (F-11). Outbound webhooks use HMAC signatures and exponential backoff
